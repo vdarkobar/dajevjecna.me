@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Screen WebM Video</title>
+    <title>Full Screen YouTube Video</title>
     <style>
         body, html {
             margin: 0;
@@ -11,18 +11,21 @@
             height: 100%;
             overflow: hidden;
         }
-        video {
+        iframe {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 100%;
             height: 100%;
-            object-fit: cover;
         }
     </style>
 </head>
 <body>
-    <video src="https://raw.githubusercontent.com/vdarkobar/media/main/abprovita/montenegro.webm" autoplay loop muted></video>
+    <iframe src="https://youtu.be/XOOpJPeByEA?autoplay=1&loop=1&playlist=YOUR_VIDEO_ID&mute=1" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+    </iframe>
 </body>
 </html>
