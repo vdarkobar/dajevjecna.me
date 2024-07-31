@@ -3,45 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Screen Google Drive Video</title>
+    <title>Full Screen Image from GitHub</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .video-container {
-            position: relative;
+        img {
             width: 100%;
             height: 100%;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
 <body>
-    <div class="video-container">
-        <iframe id="videoFrame" src="https://drive.google.com/file/d/1GYIhhbp3k9ZS2CNN0azt4k10QPIMbQl7/preview?autoplay=1" width="640" height="480" allow="autoplay"></iframe>
-    </div>
-
-    <script>
-        document.getElementById('videoFrame').addEventListener('load', function() {
-            var iframe = document.getElementById('videoFrame');
-            var video = iframe.contentDocument || iframe.contentWindow.document;
-            var player = video.getElementsByTagName('video')[0];
-
-            if (player) {
-                player.loop = true;
-                player.play();
-            }
-        });
-    </script>
+    <img src="https://github.com/vdarkobar/media/blob/main/dajevjecna/montenegro-flag.jpg?raw=true" alt="Full Screen Image">
 </body>
 </html>
