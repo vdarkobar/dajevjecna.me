@@ -28,34 +28,20 @@
 </head>
 <body>
     <div class="video-container">
-        <iframe id="videoFrame" src="https://drive.google.com/file/d/1GYIhhbp3k9ZS2CNN0azt4k10QPIMbQl7/preview" width="640" height="480" allow="autoplay"></iframe>
+        <iframe id="videoFrame" src="https://drive.google.com/file/d/1GYIhhbp3k9ZS2CNN0azt4k10QPIMbQl7/preview?autoplay=1" width="640" height="480" allow="autoplay"></iframe>
     </div>
 
     <script>
-        // Function to loop the video
-        function checkLoop() {
+        document.getElementById('videoFrame').addEventListener('load', function() {
             var iframe = document.getElementById('videoFrame');
-            var player = new YT.Player(iframe, {
-                events: {
-                    'onStateChange': function(event) {
-                        if (event.data === YT.PlayerState.ENDED) {
-                            player.seekTo(0);
-                        }
-                    }
-                }
-            });
-        }
+            var video = iframe.contentDocument || iframe.contentWindow.document;
+            var player = video.getElementsByTagName('video')[0];
 
-        // Load the IFrame Player API code asynchronously.
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        // Create an <iframe> (and YouTube player) after the API code downloads.
-        function onYouTubeIframeAPIReady() {
-            checkLoop();
-        }
+            if (player) {
+                player.loop = true;
+                player.play();
+            }
+        });
     </script>
 </body>
 </html>
