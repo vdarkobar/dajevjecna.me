@@ -13,16 +13,39 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: black; /* Adds black background for letterboxing effect */
+            background-color: black;
         }
         img {
             max-width: 100%;
             max-height: 100%;
         }
+        #play-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
-    <audio id="background-audio" src="https://github.com/vdarkobar/media/blob/main/dajevjecna/Crnogorska%20himna%20-%20National%20Anthem%20of%20Montenegro.mp3?raw=true" autoplay loop></audio>
+    <button id="play-button">Play/Pause Audio</button>
+    <audio id="background-audio" loop>
+        <source src="https://github.com/vdarkobar/media/blob/main/dajevjecna/Crnogorska%20himna%20-%20National%20Anthem%20of%20Montenegro.mp3?raw=true" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <img src="https://github.com/vdarkobar/media/blob/main/dajevjecna/montenegro-flag.jpg?raw=true" alt="Da je vječna Crna Gora">
+
+    <script>
+        const audio = document.getElementById('background-audio');
+        const playButton = document.getElementById('play-button');
+
+        playButton.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        });
+    </script>
 </body>
 </html>
