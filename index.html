@@ -233,7 +233,7 @@
         ringFill.style.strokeDasharray  = CIRCUMFERENCE;
         ringFill.style.strokeDashoffset = CIRCUMFERENCE;
 
-        let rafId = null, startTime = null, isSecondImage = false, suppressNextClick = false;
+        let rafId = null, startTime = null, isSecondImage = false, longPressAt = 0;
 
         function setSpeed(duration) {
             imgFlag.style.transition   = `opacity ${duration} ease`;
@@ -256,7 +256,7 @@
                     rafId = requestAnimationFrame(animate);
                 } else {
                     cancelRing();
-                    suppressNextClick = true; // suppress the click that fires on release
+                    longPressAt = performance.now();
                     setSpeed('2.5s');
                     imgFlag.classList.add('faded');
                     imgMobius.classList.add('visible');
@@ -275,7 +275,7 @@
 
         imgWrapper.addEventListener('pointerdown', onPointerDown);
         imgWrapper.addEventListener('click', function() {
-            if (suppressNextClick) { suppressNextClick = false; return; }
+            if (performance.now() - longPressAt < 600) return;
             if (isSecondImage) {
                 setSpeed('0.4s');
                 imgFlag.classList.remove('faded');
