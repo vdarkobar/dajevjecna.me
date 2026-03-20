@@ -24,17 +24,52 @@
             justify-content: center;
             align-items: center;
         }
-        img {
+        .img-wrapper {
+            position: relative;
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-wrapper img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-        }
-        img {
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
             animation: fadeIn 1.5s ease-in;
         }
         @keyframes fadeIn {
             from { opacity: 0; }
             to   { opacity: 1; }
+        }
+        #img-flag {
+            transition: opacity 1.2s ease;
+        }
+        #img-flag.faded {
+            opacity: 0;
+        }
+        #img-mobius {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            animation: none;
+        }
+        #img-mobius.visible {
+            opacity: 1;
+        }
+        #progress-ring {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2000;
+            display: none;
+            transform: translate(-50%, -50%);
         }
         .bottom-bar {
             position: fixed;
@@ -135,8 +170,17 @@
             <source src="https://github.com/vdarkobar/media/blob/main/dajevjecna/Crnogorska%20himna%20-%20National%20Anthem%20of%20Montenegro.mp3?raw=true" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
-        <img src="https://github.com/vdarkobar/media/blob/main/dajevjecna/montenegro-flag.jpg?raw=true" alt="Da je vječna Crna Gora">
+        <div class="img-wrapper" id="img-wrapper">
+            <img id="img-flag" src="https://github.com/vdarkobar/media/blob/main/dajevjecna/montenegro-flag.jpg?raw=true" alt="Da je vječna Crna Gora">
+            <img id="img-mobius" src="https://github.com/vdarkobar/media/blob/main/dajevjecna/mobius.webp?raw=true" alt="Mobius">
+        </div>
     </div>
+
+    <svg id="progress-ring" width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
+        <circle id="ring-fill" cx="36" cy="36" r="28" fill="none" stroke="white" stroke-width="3"
+                stroke-linecap="round" transform="rotate(-90 36 36)"/>
+    </svg>
 
     <div class="bottom-bar" id="bottom-bar">
         <button id="play-button" aria-label="Play/Pause">
@@ -174,6 +218,56 @@
 
         audio.addEventListener('play',  updateButton);
         audio.addEventListener('pause', updateButton);
+
+        // Long-press image transition
+        const imgFlag    = document.getElementById('img-flag');
+        const imgMobius  = document.getElementById('img-mobius');
+        const imgWrapper = document.getElementById('img-wrapper');
+        const ring       = document.getElementById('progress-ring');
+        const ringFill   = document.getElementById('ring-fill');
+
+        const HOLD_MS     = 800;
+        const RADIUS      = 28;
+        const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+        ringFill.style.strokeDasharray  = CIRCUMFERENCE;
+        ringFill.style.strokeDashoffset = CIRCUMFERENCE;
+
+        let rafId = null, startTime = null, isSecondImage = false;
+
+        function startHold(e) {
+            e.preventDefault();
+            const x = e.clientX ?? e.touches[0].clientX;
+            const y = e.clientY ?? e.touches[0].clientY;
+            ring.style.left    = x + 'px';
+            ring.style.top     = y + 'px';
+            ring.style.display = 'block';
+            startTime = performance.now();
+            function animate(now) {
+                const progress = Math.min((now - startTime) / HOLD_MS, 1);
+                ringFill.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+                if (progress < 1) {
+                    rafId = requestAnimationFrame(animate);
+                } else {
+                    cancelHold();
+                    isSecondImage = !isSecondImage;
+                    imgFlag.classList.toggle('faded', isSecondImage);
+                    imgMobius.classList.toggle('visible', isSecondImage);
+                }
+            }
+            rafId = requestAnimationFrame(animate);
+        }
+
+        function cancelHold() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = null; startTime = null;
+            ring.style.display = 'none';
+            ringFill.style.strokeDashoffset = CIRCUMFERENCE;
+        }
+
+        imgWrapper.addEventListener('pointerdown', startHold);
+        document.addEventListener('pointerup',     cancelHold);
+        document.addEventListener('pointercancel', cancelHold);
+        imgWrapper.addEventListener('contextmenu', e => e.preventDefault());
 
         // Auto-hide bottom bar after 3s of inactivity
         let hideTimer;
