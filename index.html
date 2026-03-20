@@ -233,7 +233,7 @@
         ringFill.style.strokeDasharray  = CIRCUMFERENCE;
         ringFill.style.strokeDashoffset = CIRCUMFERENCE;
 
-        let rafId = null, startTime = null, isSecondImage = false;
+        let rafId = null, startTime = null, isSecondImage = false, suppressRelease = false;
 
         function setSpeed(duration) {
             imgFlag.style.transition   = `opacity ${duration} ease`;
@@ -241,16 +241,7 @@
         }
 
         function onPointerDown(e) {
-            if (isSecondImage) {
-                // Click/press on mobius → fast return to flag
-                e.preventDefault();
-                setSpeed('0.4s');
-                imgFlag.classList.remove('faded');
-                imgMobius.classList.remove('visible');
-                isSecondImage = false;
-                return;
-            }
-            // Start long-press ring on flag
+            if (isSecondImage) return; // wait for pointerup to go back
             e.preventDefault();
             const x = e.clientX ?? e.touches[0].clientX;
             const y = e.clientY ?? e.touches[0].clientY;
@@ -264,7 +255,8 @@
                 if (progress < 1) {
                     rafId = requestAnimationFrame(animate);
                 } else {
-                    cancelHold();
+                    cancelRing();
+                    suppressRelease = true; // ignore the upcoming pointerup release
                     setSpeed('2.5s');
                     imgFlag.classList.add('faded');
                     imgMobius.classList.add('visible');
@@ -274,7 +266,18 @@
             rafId = requestAnimationFrame(animate);
         }
 
-        function cancelHold() {
+        function onPointerUp() {
+            cancelRing();
+            if (suppressRelease) { suppressRelease = false; return; }
+            if (isSecondImage) {
+                setSpeed('0.4s');
+                imgFlag.classList.remove('faded');
+                imgMobius.classList.remove('visible');
+                isSecondImage = false;
+            }
+        }
+
+        function cancelRing() {
             if (rafId) cancelAnimationFrame(rafId);
             rafId = null; startTime = null;
             ring.style.display = 'none';
@@ -282,8 +285,8 @@
         }
 
         imgWrapper.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('pointerup',     cancelHold);
-        document.addEventListener('pointercancel', cancelHold);
+        document.addEventListener('pointerup',     onPointerUp);
+        document.addEventListener('pointercancel', onPointerUp);
         imgWrapper.addEventListener('contextmenu', e => e.preventDefault());
 
         // Auto-hide bottom bar after 3s of inactivity
