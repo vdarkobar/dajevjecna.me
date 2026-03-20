@@ -241,7 +241,7 @@
         }
 
         function onPointerDown(e) {
-            if (isSecondImage) return; // tap will be handled by click event
+            if (isSecondImage) { longPressAt = 0; return; } // reset window so next click fires
             e.preventDefault();
             const x = e.clientX ?? e.touches[0].clientX;
             const y = e.clientY ?? e.touches[0].clientY;
