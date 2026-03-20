@@ -233,7 +233,7 @@
         ringFill.style.strokeDasharray  = CIRCUMFERENCE;
         ringFill.style.strokeDashoffset = CIRCUMFERENCE;
 
-        let rafId = null, startTime = null, isSecondImage = false, longPressAt = 0;
+        let rafId = null, startTime = null, isSecondImage = false, pendingBack = false;
 
         function setSpeed(duration) {
             imgFlag.style.transition   = `opacity ${duration} ease`;
@@ -241,7 +241,11 @@
         }
 
         function onPointerDown(e) {
-            if (isSecondImage) { longPressAt = 0; return; } // reset window so next click fires
+            if (isSecondImage) {
+                pendingBack = true; // confirmed on pointerup
+                return;
+            }
+            pendingBack = false;
             e.preventDefault();
             const x = e.clientX ?? e.touches[0].clientX;
             const y = e.clientY ?? e.touches[0].clientY;
@@ -256,7 +260,6 @@
                     rafId = requestAnimationFrame(animate);
                 } else {
                     cancelRing();
-                    longPressAt = performance.now();
                     setSpeed('2.5s');
                     imgFlag.classList.add('faded');
                     imgMobius.classList.add('visible');
@@ -266,6 +269,17 @@
             rafId = requestAnimationFrame(animate);
         }
 
+        function onPointerUp() {
+            cancelRing();
+            if (pendingBack) {
+                pendingBack = false;
+                setSpeed('0.4s');
+                imgFlag.classList.remove('faded');
+                imgMobius.classList.remove('visible');
+                isSecondImage = false;
+            }
+        }
+
         function cancelRing() {
             if (rafId) cancelAnimationFrame(rafId);
             rafId = null; startTime = null;
@@ -273,19 +287,10 @@
             ringFill.style.strokeDashoffset = CIRCUMFERENCE;
         }
 
-        imgWrapper.addEventListener('pointerdown', onPointerDown);
-        imgWrapper.addEventListener('click', function() {
-            if (performance.now() - longPressAt < 600) return;
-            if (isSecondImage) {
-                setSpeed('0.4s');
-                imgFlag.classList.remove('faded');
-                imgMobius.classList.remove('visible');
-                isSecondImage = false;
-            }
-        });
-        document.addEventListener('pointerup',     cancelRing);
-        document.addEventListener('pointercancel', cancelRing);
-        imgWrapper.addEventListener('contextmenu', e => e.preventDefault());
+        imgWrapper.addEventListener('pointerdown',  onPointerDown);
+        document.addEventListener('pointerup',      onPointerUp);
+        document.addEventListener('pointercancel',  () => { cancelRing(); pendingBack = false; });
+        imgWrapper.addEventListener('contextmenu',  e => e.preventDefault());
 
         // Auto-hide bottom bar after 3s of inactivity
         let hideTimer;
