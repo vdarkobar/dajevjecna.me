@@ -29,43 +29,57 @@
             max-height: 100%;
             object-fit: contain;
         }
+        img {
+            animation: fadeIn 1.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
         #play-button {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 16px;
+            left: 16px;
             z-index: 1000;
-            padding: 5px 10px;
-            font-size: 14px;
-            background-color: rgba(0, 0, 0, 0.3);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: white;
-            border: 1px solid white;
-            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background 0.3s, box-shadow 0.3s;
         }
         #play-button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.25);
         }
-
-        /* Media Queries for Responsiveness */
-        @media (max-width: 768px) {
-            #play-button {
-                padding: 4px 8px;
-                font-size: 12px;
-            }
+        #play-button.playing {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
         }
-
-        @media (max-width: 480px) {
-            #play-button {
-                padding: 3px 6px;
-                font-size: 10px;
-            }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70%  { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        #play-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <button id="play-button">Play/Pause</button>
+        <button id="play-button" aria-label="Play/Pause">
+            <svg id="icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
         <audio id="background-audio" loop>
             <source src="https://github.com/vdarkobar/media/blob/main/dajevjecna/Crnogorska%20himna%20-%20National%20Anthem%20of%20Montenegro.mp3?raw=true" type="audio/mpeg">
             Your browser does not support the audio element.
@@ -77,6 +91,16 @@
         const audio = document.getElementById('background-audio');
         const playButton = document.getElementById('play-button');
 
+        const iconPlay  = document.getElementById('icon-play');
+        const iconPause = document.getElementById('icon-pause');
+
+        function updateButton() {
+            const playing = !audio.paused;
+            iconPlay.style.display  = playing ? 'none'  : 'block';
+            iconPause.style.display = playing ? 'block' : 'none';
+            playButton.classList.toggle('playing', playing);
+        }
+
         playButton.addEventListener('click', function() {
             if (audio.paused) {
                 audio.play();
@@ -84,6 +108,9 @@
                 audio.pause();
             }
         });
+
+        audio.addEventListener('play',  updateButton);
+        audio.addEventListener('pause', updateButton);
     </script>
 </body>
 </html>
