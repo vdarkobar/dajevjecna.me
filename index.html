@@ -60,6 +60,7 @@
             opacity: 0;
             transition: opacity 1.2s ease;
             animation: none;
+            cursor: pointer;
         }
         #img-mobius.visible {
             opacity: 1;
@@ -226,15 +227,30 @@
         const ring       = document.getElementById('progress-ring');
         const ringFill   = document.getElementById('ring-fill');
 
-        const HOLD_MS     = 800;
-        const RADIUS      = 28;
+        const HOLD_MS       = 800;
+        const RADIUS        = 28;
         const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
         ringFill.style.strokeDasharray  = CIRCUMFERENCE;
         ringFill.style.strokeDashoffset = CIRCUMFERENCE;
 
         let rafId = null, startTime = null, isSecondImage = false;
 
-        function startHold(e) {
+        function setSpeed(duration) {
+            imgFlag.style.transition   = `opacity ${duration} ease`;
+            imgMobius.style.transition = `opacity ${duration} ease`;
+        }
+
+        function onPointerDown(e) {
+            if (isSecondImage) {
+                // Click/press on mobius → fast return to flag
+                e.preventDefault();
+                setSpeed('0.4s');
+                imgFlag.classList.remove('faded');
+                imgMobius.classList.remove('visible');
+                isSecondImage = false;
+                return;
+            }
+            // Start long-press ring on flag
             e.preventDefault();
             const x = e.clientX ?? e.touches[0].clientX;
             const y = e.clientY ?? e.touches[0].clientY;
@@ -249,9 +265,10 @@
                     rafId = requestAnimationFrame(animate);
                 } else {
                     cancelHold();
-                    isSecondImage = !isSecondImage;
-                    imgFlag.classList.toggle('faded', isSecondImage);
-                    imgMobius.classList.toggle('visible', isSecondImage);
+                    setSpeed('2.5s');
+                    imgFlag.classList.add('faded');
+                    imgMobius.classList.add('visible');
+                    isSecondImage = true;
                 }
             }
             rafId = requestAnimationFrame(animate);
@@ -264,7 +281,7 @@
             ringFill.style.strokeDashoffset = CIRCUMFERENCE;
         }
 
-        imgWrapper.addEventListener('pointerdown', startHold);
+        imgWrapper.addEventListener('pointerdown', onPointerDown);
         document.addEventListener('pointerup',     cancelHold);
         document.addEventListener('pointercancel', cancelHold);
         imgWrapper.addEventListener('contextmenu', e => e.preventDefault());
