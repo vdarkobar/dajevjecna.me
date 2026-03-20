@@ -31,7 +31,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: none;
         }
         .img-wrapper img {
             max-width: 100%;
@@ -234,7 +233,7 @@
         ringFill.style.strokeDasharray  = CIRCUMFERENCE;
         ringFill.style.strokeDashoffset = CIRCUMFERENCE;
 
-        let rafId = null, startTime = null, isSecondImage = false, holdCompleted = false;
+        let rafId = null, startTime = null, isSecondImage = false, pendingBack = false;
 
         function setSpeed(duration) {
             imgFlag.style.transition   = `opacity ${duration} ease`;
@@ -242,17 +241,17 @@
         }
 
         function onPointerDown(e) {
+            if (isSecondImage) {
+                pendingBack = true; // confirmed on pointerup
+                return;
+            }
+            pendingBack = false;
             e.preventDefault();
-            if (e.pointerId != null) imgWrapper.setPointerCapture(e.pointerId);
-
-            if (isSecondImage) return;
-
-            const x = e.clientX;
-            const y = e.clientY;
+            const x = e.clientX ?? e.touches[0].clientX;
+            const y = e.clientY ?? e.touches[0].clientY;
             ring.style.left    = x + 'px';
             ring.style.top     = y + 'px';
             ring.style.display = 'block';
-            holdCompleted = false;
             startTime = performance.now();
             function animate(now) {
                 const progress = Math.min((now - startTime) / HOLD_MS, 1);
@@ -261,7 +260,6 @@
                     rafId = requestAnimationFrame(animate);
                 } else {
                     cancelRing();
-                    holdCompleted = true;
                     setSpeed('2.5s');
                     imgFlag.classList.add('faded');
                     imgMobius.classList.add('visible');
@@ -271,13 +269,10 @@
             rafId = requestAnimationFrame(animate);
         }
 
-        function onPointerUp(e) {
+        function onPointerUp() {
             cancelRing();
-            if (e?.pointerId != null) {
-                try { imgWrapper.releasePointerCapture(e.pointerId); } catch {}
-            }
-            if (holdCompleted) { holdCompleted = false; return; } // ignore release that ends the long press
-            if (isSecondImage) {
+            if (pendingBack) {
+                pendingBack = false;
                 setSpeed('0.4s');
                 imgFlag.classList.remove('faded');
                 imgMobius.classList.remove('visible');
@@ -294,7 +289,7 @@
 
         imgWrapper.addEventListener('pointerdown',  onPointerDown);
         document.addEventListener('pointerup',      onPointerUp);
-        document.addEventListener('pointercancel',  onPointerUp);
+        document.addEventListener('pointercancel',  () => { cancelRing(); pendingBack = false; });
         imgWrapper.addEventListener('contextmenu',  e => e.preventDefault());
 
         // Auto-hide bottom bar after 3s of inactivity
