@@ -1,307 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Da je vječna Crna Gora</title>
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/vdarkobar/media/main/dajevjecna/Grb-Crne-Gore.ico">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: black;
-        }
-        .container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .img-wrapper {
-            position: relative;
-            max-width: 100%;
-            max-height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .img-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            user-select: none;
-            -webkit-user-drag: none;
-            -webkit-touch-callout: none;
-            animation: fadeIn 1.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-        #img-flag {
-            transition: opacity 1.2s ease;
-        }
-        #img-flag.faded {
-            opacity: 0;
-        }
-        #img-mobius {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            opacity: 0;
-            transition: opacity 1.2s ease;
-            animation: none;
-            cursor: pointer;
-        }
-        #img-mobius.visible {
-            opacity: 1;
-        }
-        #progress-ring {
-            position: fixed;
-            pointer-events: none;
-            z-index: 2000;
-            display: none;
-            transform: translate(-50%, -50%);
-        }
-        .bottom-bar {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 50px;
-            opacity: 1;
-            transition: opacity 0.6s ease;
-        }
-        .bottom-bar.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        #play-button {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background 0.3s, box-shadow 0.3s;
-            flex-shrink: 0;
-        }
-        #play-button:hover {
-            background: rgba(255, 255, 255, 0.28);
-        }
-        #play-button.playing {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-            70%  { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-        #play-button svg {
-            width: 18px;
-            height: 18px;
-            fill: white;
-        }
-        .volume-icon {
-            display: flex;
-            align-items: center;
-        }
-        .volume-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: rgba(255, 255, 255, 0.8);
-        }
-        #volume-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100px;
-            height: 4px;
-            border-radius: 2px;
-            background: rgba(255, 255, 255, 0.3);
-            outline: none;
-            cursor: pointer;
-        }
-        #volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: white;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-        #volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-        #volume-slider::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: white;
-            cursor: pointer;
-            border: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Da je vječna Crna Gora</title>
+  <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/vdarkobar/media/main/dajevjecna/Grb-Crne-Gore.ico" />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+
+    .img-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #img-flag {
+      transition: opacity 1.2s ease;
+      display: block;
+    }
+
+    #img-flag.faded {
+      opacity: 0;
+    }
+
+    #img-mobius {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      animation: none;
+      pointer-events: none;
+    }
+
+    #img-mobius.visible {
+      opacity: 1;
+    }
+
+    #progress-ring {
+      position: fixed;
+      pointer-events: none;
+      z-index: 2000;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50px;
+      opacity: 1;
+      transition: opacity 0.6s ease;
+    }
+
+    .bottom-bar.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #play-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.3s, box-shadow 0.3s;
+      flex-shrink: 0;
+    }
+
+    #play-button:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    #play-button.playing {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+
+    #play-button svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+
+    .volume-icon {
+      display: flex;
+      align-items: center;
+    }
+
+    .volume-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: rgba(255, 255, 255, 0.8);
+    }
+
+    #volume-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.3);
+      outline: none;
+      cursor: pointer;
+    }
+
+    #volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    #volume-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    #volume-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <audio id="background-audio" loop>
-            <source src="https://github.com/vdarkobar/media/blob/main/dajevjecna/Crnogorska%20himna%20-%20National%20Anthem%20of%20Montenegro.mp3?raw=true" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-        <div class="img-wrapper" id="img-wrapper">
-            <img id="img-flag" src="https://github.com/vdarkobar/media/blob/main/dajevjecna/montenegro-flag.jpg?raw=true" alt="Da je vječna Crna Gora">
-            <img id="img-mobius" src="https://github.com/vdarkobar/media/blob/main/dajevjecna/mobius.webp?raw=true" alt="Mobius">
-        </div>
+  <div class="container">
+    <audio id="background-audio" loop>
+      <source src="https://raw.githubusercontent.com/vdarkobar/media/main/dajevjecna/Crnogorska%20himna%20-%20National%20Anthem%20of%20Montenegro.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <div class="img-wrapper" id="img-wrapper">
+      <img id="img-flag" src="https://raw.githubusercontent.com/vdarkobar/media/main/dajevjecna/montenegro-flag.jpg" alt="Da je vječna Crna Gora" />
+      <img id="img-mobius" src="https://raw.githubusercontent.com/vdarkobar/media/main/dajevjecna/mobius.webp" alt="Mobius" />
     </div>
+  </div>
 
-    <svg id="progress-ring" width="72" height="72" viewBox="0 0 72 72">
-        <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
-        <circle id="ring-fill" cx="36" cy="36" r="28" fill="none" stroke="white" stroke-width="3"
-                stroke-linecap="round" transform="rotate(-90 36 36)"/>
-    </svg>
+  <svg id="progress-ring" width="72" height="72" viewBox="0 0 72 72">
+    <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3" />
+    <circle id="ring-fill" cx="36" cy="36" r="28" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" transform="rotate(-90 36 36)" />
+  </svg>
 
-    <div class="bottom-bar" id="bottom-bar">
-        <button id="play-button" aria-label="Play/Pause">
-            <svg id="icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
-            <svg id="icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-        </button>
-        <span class="volume-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        </span>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
-    </div>
+  <div class="bottom-bar" id="bottom-bar">
+    <button id="play-button" aria-label="Play/Pause">
+      <svg id="icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+      <svg id="icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    </button>
+    <span class="volume-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+    </span>
+    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume" />
+  </div>
 
-    <script>
-        const audio       = document.getElementById('background-audio');
-        const playButton  = document.getElementById('play-button');
-        const iconPlay    = document.getElementById('icon-play');
-        const iconPause   = document.getElementById('icon-pause');
-        const volumeSlider = document.getElementById('volume-slider');
-        const bottomBar   = document.getElementById('bottom-bar');
+  <script>
+    const audio = document.getElementById('background-audio');
+    const playButton = document.getElementById('play-button');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    const volumeSlider = document.getElementById('volume-slider');
+    const bottomBar = document.getElementById('bottom-bar');
 
-        function updateButton() {
-            const playing = !audio.paused;
-            iconPlay.style.display  = playing ? 'none'  : 'block';
-            iconPause.style.display = playing ? 'block' : 'none';
-            playButton.classList.toggle('playing', playing);
+    function updateButton() {
+      const playing = !audio.paused;
+      iconPlay.style.display = playing ? 'none' : 'block';
+      iconPause.style.display = playing ? 'block' : 'none';
+      playButton.classList.toggle('playing', playing);
+    }
+
+    playButton.addEventListener('click', function () {
+      if (audio.paused) audio.play();
+      else audio.pause();
+    });
+
+    volumeSlider.addEventListener('input', function () {
+      audio.volume = this.value;
+    });
+
+    audio.addEventListener('play', updateButton);
+    audio.addEventListener('pause', updateButton);
+
+    const imgFlag = document.getElementById('img-flag');
+    const imgMobius = document.getElementById('img-mobius');
+    const imgWrapper = document.getElementById('img-wrapper');
+    const ring = document.getElementById('progress-ring');
+    const ringFill = document.getElementById('ring-fill');
+
+    const HOLD_MS = 800;
+    const RADIUS = 28;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+    ringFill.style.strokeDasharray = CIRCUMFERENCE;
+    ringFill.style.strokeDashoffset = CIRCUMFERENCE;
+
+    let rafId = null;
+    let holdTimer = null;
+    let startTime = null;
+    let isSecondImage = false;
+    let activeTouchId = null;
+    let mousePressed = false;
+
+    function setSpeed(duration) {
+      imgFlag.style.transition = `opacity ${duration} ease`;
+      imgMobius.style.transition = `opacity ${duration} ease`;
+    }
+
+    function cancelRing() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      startTime = null;
+      ring.style.display = 'none';
+      ringFill.style.strokeDashoffset = CIRCUMFERENCE;
+    }
+
+    function cancelHold() {
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = null;
+      cancelRing();
+    }
+
+    function showSecondImage() {
+      cancelRing();
+      setSpeed('2.5s');
+      imgFlag.classList.add('faded');
+      imgMobius.classList.add('visible');
+      isSecondImage = true;
+      holdTimer = null;
+    }
+
+    function showFirstImage() {
+      setSpeed('0.4s');
+      imgFlag.classList.remove('faded');
+      imgMobius.classList.remove('visible');
+      isSecondImage = false;
+    }
+
+    function startProgressAt(x, y) {
+      ring.style.left = x + 'px';
+      ring.style.top = y + 'px';
+      ring.style.display = 'block';
+      startTime = performance.now();
+
+      function animate(now) {
+        if (!startTime) return;
+        const progress = Math.min((now - startTime) / HOLD_MS, 1);
+        ringFill.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+        if (progress < 1) rafId = requestAnimationFrame(animate);
+      }
+
+      rafId = requestAnimationFrame(animate);
+    }
+
+    function startHold(x, y) {
+      if (isSecondImage || holdTimer) return;
+      startProgressAt(x, y);
+      holdTimer = setTimeout(showSecondImage, HOLD_MS);
+    }
+
+    function endHold() {
+      if (holdTimer) {
+        cancelHold();
+      } else {
+        cancelRing();
+      }
+
+      if (isSecondImage) {
+        showFirstImage();
+      }
+    }
+
+    imgWrapper.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      mousePressed = true;
+      startHold(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mouseup', function () {
+      if (!mousePressed && !isSecondImage) return;
+      mousePressed = false;
+      endHold();
+    });
+
+    imgWrapper.addEventListener('touchstart', function (e) {
+      if (activeTouchId !== null) return;
+      const touch = e.changedTouches[0];
+      activeTouchId = touch.identifier;
+      startHold(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    function handleTouchEnd(e) {
+      let ended = false;
+      for (const touch of e.changedTouches) {
+        if (touch.identifier === activeTouchId) {
+          ended = true;
+          break;
         }
+      }
+      if (!ended && !isSecondImage) return;
+      activeTouchId = null;
+      endHold();
+    }
 
-        playButton.addEventListener('click', function() {
-            if (audio.paused) { audio.play(); } else { audio.pause(); }
-        });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    document.addEventListener('touchcancel', handleTouchEnd, { passive: true });
 
-        volumeSlider.addEventListener('input', function() {
-            audio.volume = this.value;
-        });
+    imgWrapper.addEventListener('contextmenu', e => e.preventDefault());
 
-        audio.addEventListener('play',  updateButton);
-        audio.addEventListener('pause', updateButton);
+    let hideTimer;
+    function showBar() {
+      bottomBar.classList.remove('hidden');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => bottomBar.classList.add('hidden'), 3000);
+    }
 
-        // Long-press image transition
-        const imgFlag    = document.getElementById('img-flag');
-        const imgMobius  = document.getElementById('img-mobius');
-        const imgWrapper = document.getElementById('img-wrapper');
-        const ring       = document.getElementById('progress-ring');
-        const ringFill   = document.getElementById('ring-fill');
-
-        const HOLD_MS       = 800;
-        const RADIUS        = 28;
-        const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-        ringFill.style.strokeDasharray  = CIRCUMFERENCE;
-        ringFill.style.strokeDashoffset = CIRCUMFERENCE;
-
-        let rafId = null, startTime = null, isSecondImage = false, pendingBack = false;
-
-        function setSpeed(duration) {
-            imgFlag.style.transition   = `opacity ${duration} ease`;
-            imgMobius.style.transition = `opacity ${duration} ease`;
-        }
-
-        function onPointerDown(e) {
-            if (isSecondImage) {
-                pendingBack = true; // confirmed on pointerup
-                return;
-            }
-            pendingBack = false;
-            e.preventDefault();
-            const x = e.clientX ?? e.touches[0].clientX;
-            const y = e.clientY ?? e.touches[0].clientY;
-            ring.style.left    = x + 'px';
-            ring.style.top     = y + 'px';
-            ring.style.display = 'block';
-            startTime = performance.now();
-            function animate(now) {
-                const progress = Math.min((now - startTime) / HOLD_MS, 1);
-                ringFill.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
-                if (progress < 1) {
-                    rafId = requestAnimationFrame(animate);
-                } else {
-                    cancelRing();
-                    setSpeed('2.5s');
-                    imgFlag.classList.add('faded');
-                    imgMobius.classList.add('visible');
-                    isSecondImage = true;
-                }
-            }
-            rafId = requestAnimationFrame(animate);
-        }
-
-        function onPointerUp() {
-            cancelRing();
-            if (pendingBack) {
-                pendingBack = false;
-                setSpeed('0.4s');
-                imgFlag.classList.remove('faded');
-                imgMobius.classList.remove('visible');
-                isSecondImage = false;
-            }
-        }
-
-        function cancelRing() {
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = null; startTime = null;
-            ring.style.display = 'none';
-            ringFill.style.strokeDashoffset = CIRCUMFERENCE;
-        }
-
-        imgWrapper.addEventListener('pointerdown',  onPointerDown);
-        document.addEventListener('pointerup',      onPointerUp);
-        document.addEventListener('pointercancel',  () => { cancelRing(); pendingBack = false; });
-        imgWrapper.addEventListener('contextmenu',  e => e.preventDefault());
-
-        // Auto-hide bottom bar after 3s of inactivity
-        let hideTimer;
-        function showBar() {
-            bottomBar.classList.remove('hidden');
-            clearTimeout(hideTimer);
-            hideTimer = setTimeout(() => bottomBar.classList.add('hidden'), 3000);
-        }
-        document.addEventListener('mousemove', showBar);
-        document.addEventListener('touchstart', showBar);
-        showBar();
-    </script>
+    document.addEventListener('mousemove', showBar);
+    document.addEventListener('touchstart', showBar, { passive: true });
+    showBar();
+    updateButton();
+  </script>
 </body>
 </html>
