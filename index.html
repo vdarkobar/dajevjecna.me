@@ -589,7 +589,8 @@
       justify-content: space-between;
       padding: 16px 20px 12px;
       border-bottom: 1px solid rgba(28,24,16,0.12);
-      background: var(--bg);
+      background: transparent;
+      position: relative;
       z-index: 10;
     }
     .mobile-header-title-wrap { display: flex; align-items: center; gap: 10px; }
@@ -613,17 +614,39 @@
       overflow-x: hidden;
       padding: 24px 20px 120px 52px;
       position: relative;
+      z-index: 1;
     }
     .mobile-scroll::-webkit-scrollbar { display: none; }
+    .mobile-scroll-inner { position: relative; }
 
-    /* Vertical rail */
+    /* Vertical rail — grows with content, aligned to dot centers */
     .mobile-rail {
       position: absolute;
-      left: 34px;
-      top: 0; bottom: 0;
+      left: 40px;
+      top: 0;
+      bottom: 0;
       width: 1px;
       background: var(--rail);
+      z-index: 1;
     }
+
+    /* Mobile: narrower, screen-width backgrounds with same cross-fade */
+    .mobile-bg-layer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+      transition: opacity 0.9s ease;
+    }
+    .mobile-bg-flag { opacity: 0.22; }
+    .mobile-bg-mobius { opacity: 0; }
+    .mobile-bg-flag.fade-out { opacity: 0; }
+    .mobile-bg-mobius.fade-in { opacity: 0.13; }
 
     /* Era section header */
     .mobile-era-label {
@@ -850,14 +873,32 @@ function groupByEra(events) {
 
 function MobileTimeline({ lang, switchLang, t, loc }) {
   const [active, setActive] = useState(null);
+  const [moved, setMoved] = useState(false);
+  const scrollRef = useRef(null);
   const handleSetActive = id => setActive(active === id ? null : id);
+
+  // Cross-fade background: show mobius while scrolling, return to flag on pause
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let timer;
+    const onScroll = () => {
+      setMoved(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setMoved(false), 900);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => { el.removeEventListener('scroll', onScroll); clearTimeout(timer); };
+  }, []);
 
   const activeEvent = EVENTS.find(e => e.id === active);
   const groups = groupByEra(EVENTS);
 
   return (
-    <div style={{ height:'100vh', display:'flex', flexDirection:'column', background:'var(--bg)' }}>
-      <img src="assets/mobius01.png" className="timeline-bg" alt="" />
+    <div style={{ height:'100vh', display:'flex', flexDirection:'column' }}>
+      {/* Cross-fading backgrounds */}
+      <img src="assets/montenegro-flag.jpg" className={`mobile-bg-layer mobile-bg-flag${moved ? ' fade-out' : ''}`} alt="" />
+      <img src="assets/mobius01.png" className={`mobile-bg-layer mobile-bg-mobius${moved ? ' fade-in' : ''}`} alt="" />
 
       {/* Mobile Header */}
       <header className="mobile-header">
@@ -876,37 +917,39 @@ function MobileTimeline({ lang, switchLang, t, loc }) {
       </header>
 
       {/* Vertical scroll */}
-      <div className="mobile-scroll">
-        <div className="mobile-rail" />
+      <div className="mobile-scroll" ref={scrollRef}>
+        <div className="mobile-scroll-inner">
+          <div className="mobile-rail" />
 
-        {groups.map(group => (
-          <div key={group.era}>
-            {/* Era label */}
-            <div className="mobile-era-label" style={{ color: TAG_COLORS[group.era] }}>
-              {t.eras[group.era]}
+          {groups.map(group => (
+            <div key={group.era}>
+              {/* Era label */}
+              <div className="mobile-era-label" style={{ color: TAG_COLORS[group.era] }}>
+                {t.eras[group.era]}
+              </div>
+
+              {group.events.map(ev => {
+                const evLoc = loc(ev);
+                return (
+                  <div
+                    key={ev.id}
+                    className={`mobile-event${active === ev.id ? ' active' : ''}`}
+                    onClick={() => handleSetActive(ev.id)}
+                  >
+                    <div className="mobile-dot-wrap">
+                      <div className="mobile-dot" />
+                    </div>
+                    <div className="mobile-card">
+                      <div className="mobile-year">{ev.year}</div>
+                      <div className="mobile-title">{evLoc.title}</div>
+                      <div className="mobile-short">{evLoc.short}</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-            {group.events.map(ev => {
-              const evLoc = loc(ev);
-              return (
-                <div
-                  key={ev.id}
-                  className={`mobile-event${active === ev.id ? ' active' : ''}`}
-                  onClick={() => handleSetActive(ev.id)}
-                >
-                  <div className="mobile-dot-wrap">
-                    <div className="mobile-dot" />
-                  </div>
-                  <div className="mobile-card">
-                    <div className="mobile-year">{ev.year}</div>
-                    <div className="mobile-title">{evLoc.title}</div>
-                    <div className="mobile-short">{evLoc.short}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Overlay */}
