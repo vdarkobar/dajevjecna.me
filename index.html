@@ -389,6 +389,10 @@
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
+    /* Keep the bg cross-fade — it's subtle and not motion-sickness-inducing */
+    .timeline-bg-layer, .mobile-bg-layer {
+      transition: opacity 0.9s ease !important;
+    }
   }
   .event.key-event:hover .dot, .event.key-event.active .dot {
     background: var(--red);
@@ -636,7 +640,7 @@
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
       pointer-events: none;
       z-index: 0;
@@ -1398,7 +1402,3 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-</script>
-</body>
-</html>
