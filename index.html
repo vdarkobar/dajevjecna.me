@@ -129,6 +129,7 @@
     width: 100vw;
     height: 100vh;
     object-fit: cover;
+    object-position: center;
     pointer-events: none;
     z-index: 0;
     user-select: none;
@@ -623,10 +624,10 @@
     .mobile-scroll::-webkit-scrollbar { display: none; }
     .mobile-scroll-inner { position: relative; }
 
-    /* Vertical rail — grows with content, aligned to dot centers */
+    /* Vertical rail — grows with content, aligned to dot centers at 40px */
     .mobile-rail {
       position: absolute;
-      left: 40px;
+      left: -12px;
       top: 0;
       bottom: 0;
       width: 1px;
@@ -637,11 +638,11 @@
     /* Mobile: narrower, screen-width backgrounds with same cross-fade */
     .mobile-bg-layer {
       position: fixed;
-      top: 0; left: 0;
+      top: 50%; left: 0;
+      transform: translateY(-50%);
       width: 100vw;
-      height: 100vh;
+      height: auto;
       object-fit: contain;
-      object-position: center;
       pointer-events: none;
       z-index: 0;
       user-select: none;
